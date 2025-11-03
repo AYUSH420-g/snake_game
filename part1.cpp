@@ -1,3 +1,4 @@
+// snake_part2.cpp
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -27,6 +28,13 @@ int main() {
     int boardWidth = 30;
     int boardHeight = 20;
     drawBorder(boardWidth, boardHeight);
+    
+    // Display score and controls
+    cout << "\033[" << (boardHeight + 1) << ";0H"; // move cursor
+    cout << "Score: 0   ";
+    cout << "\n";
+    cout << "Controls: W(Up) A(Left) S(Down) D(Right) | X(Exit)";
+    
     cout << "\n\nPress Enter to exit…";
     cin.get();
     return 0;
