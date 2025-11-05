@@ -8,7 +8,6 @@
 
 using namespace std;
 
-// Set terminal input to non-blocking / no echo
 void setNonBlocking(bool enable) {
     static struct termios oldt, newt;
     if (enable) {
@@ -39,16 +38,13 @@ char getch_nonblocking() {
 }
 
 void setCursorPosition(int x, int y) {
-    // ANSI escape: move cursor to row = y+1, col = x+1
     cout << "\033[" << (y+1) << ";" << (x+1) << "H";
 }
 
 void clearScreen() {
-    // Clear screen and move cursor home
     cout << "\033[2J\033[H";
 }
 
-// Point class to represent coordinates
 class Point {
 public:
     int x, y;
@@ -157,7 +153,6 @@ public:
     char getBodySymbol() const { return bodySymbol; }
 };
 
-// GameBoard class with optimized rendering
 class GameBoard {
 private:
     int width, height;
@@ -181,7 +176,6 @@ public:
     }
     
     void display(const Snake& snake, const Food& food, int score) {
-        // Clear previous snake position
         for (const auto& seg : previousBody) {
             setCursorPosition(seg.x, seg.y);
             cout << ' ';
@@ -225,7 +219,6 @@ public:
     }
 };
 
-// Game class - Main game controller
 class Game {
 private:
     GameBoard* board;
@@ -233,7 +226,7 @@ private:
     Food* food;
     int score;
     bool gameOver;
-    int speed;  // milliseconds between moves
+    int speed;  
     
 public:
     Game(int boardWidth = 30, int boardHeight = 20)
