@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <fstream>
+#include <limits>
 
 using namespace std;
 
@@ -175,7 +177,8 @@ public:
         }
     }
     
-    void display(const Snake& snake, const Food& food, int score) {
+    void display(const Snake& snake, const Food& food, int score, int highScore) {
+        // Erase previous body
         for (const auto& seg : previousBody) {
             setCursorPosition(seg.x, seg.y);
             cout << ' ';
@@ -197,9 +200,9 @@ public:
             }
         }
         
-        // Update score and controls
+        // Score and controls
         setCursorPosition(0, height);
-        cout << "Score: " << score << "   ";
+        cout << "Score: " << score << " | High Score: " << highScore << "   ";
         setCursorPosition(0, height + 1);
         cout << "Controls: W(Up) A(Left) S(Down) D(Right) | X(Exit)";
         
@@ -225,8 +228,28 @@ private:
     Snake* snake;
     Food* food;
     int score;
+    int highScore;
     bool gameOver;
-    int speed;  
+    int speed;
+    const string highScoreFile = "highscore.txt";
+    
+    void loadHighScore() {
+        ifstream file(highScoreFile);
+        if (file.is_open()) {
+            file >> highScore;
+            file.close();
+        } else {
+            highScore = 0;
+        }
+    }
+    
+    void saveHighScore() {
+        ofstream file(highScoreFile);
+        if (file.is_open()) {
+            file << highScore;
+            file.close();
+        }
+    }
     
 public:
     Game(int boardWidth = 30, int boardHeight = 20)
@@ -235,6 +258,7 @@ public:
         snake = new Snake(boardWidth / 2, boardHeight / 2);
         food = new Food();
         food->spawn(boardWidth, boardHeight, snake->getBody());
+        loadHighScore();
     }
     
     ~Game() {
@@ -278,7 +302,7 @@ public:
     }
     
     void render() {
-        board->display(*snake, *food, score);
+        board->display(*snake, *food, score, highScore);
     }
     
     void run() {
@@ -298,20 +322,24 @@ public:
     }
     
     void showGameOver() {
+        if (score > highScore) {
+            highScore = score;
+            saveHighScore();
+        }
+        
         board->clear();
         cout << "\n\n";
         cout << "  |------------------------------------|\n";
         cout << "  |          GAME OVER!                |\n";
         cout << "  |------------------------------------|\n";
-        cout << "  |                                    |\n";
-        cout << "  |       Final Score: " << score;
-        cout << "               |\n";
-        cout << "  |                                    |\n";
+        cout << "  |       Final Score: " << score << "\n";
+        cout << "  |       High Score:  " << highScore << "\n";
         cout << "  |------------------------------------|\n\n";
         
         cout << "  Play again? (Y/N): ";
         char choice;
         cin >> choice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         
         if (toupper(choice) == 'Y') {
             delete board;
@@ -325,7 +353,6 @@ public:
             score = 0;
             gameOver = false;
             speed = 150;
-            
             run();
         }
     }
