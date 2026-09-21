@@ -17,6 +17,7 @@ P f;
 int w = 30, h = 20, sc = 0, hs = 0, sp = 150;
 char d = 'R';
 bool go = 0;
+int (*get_input)() = getchar;
 
 void nb(bool e) {
     static termios o, n;
@@ -124,7 +125,7 @@ int main() {
     
     nb(1);
     while (!go) {
-        int c = getchar();
+        int c = get_input();
         if (c != EOF) {
             c = toupper(c);
             if (c == 'W' && d != 'D') d = 'U';
